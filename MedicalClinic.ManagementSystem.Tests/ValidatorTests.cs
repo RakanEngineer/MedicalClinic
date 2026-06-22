@@ -1,5 +1,6 @@
 using MedicalClinic.ManagementSystem.Shared.DTOs.Appointments;
 using MedicalClinic.ManagementSystem.Shared.DTOs.Patients;
+using MedicalClinic.ManagementSystem.Shared.DTOs.Prescriptions;
 using MedicalClinic.ManagementSystem.Shared.Validation;
 
 namespace MedicalClinic.ManagementSystem.Tests;
@@ -58,5 +59,26 @@ public class ValidatorTests
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, error => error.PropertyName == nameof(PatientCreateDto.DateOfBirth));
+    }
+
+    [Fact]
+    public void PrescriptionCreateValidator_WhenStatusIsInvalid_Fails()
+    {
+        var validator = new CreatePrescriptionDtoValidator();
+        var dto = new CreatePrescriptionDto
+        {
+            PatientId = Guid.NewGuid(),
+            DoctorId = Guid.NewGuid(),
+            MedicationName = "Amoxicillin",
+            Dosage = "500mg",
+            Frequency = "Twice daily",
+            Duration = "7 days",
+            Status = "Paused"
+        };
+
+        var result = validator.Validate(dto);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, error => error.PropertyName == nameof(CreatePrescriptionDto.Status));
     }
 }

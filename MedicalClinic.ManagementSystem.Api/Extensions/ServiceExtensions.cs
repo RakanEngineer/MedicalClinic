@@ -85,10 +85,12 @@ public static class ServiceExtensions
         services.AddScoped<IDoctorRepository, DoctorRepository>();
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         services.AddScoped<IMedicalRecordRepository, MedicalRecordRepository>();
+        services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
         services.AddScoped(provider => new Lazy<IPatientRepository>(() => provider.GetRequiredService<IPatientRepository>()));
         services.AddScoped(provider => new Lazy<IDoctorRepository>(() => provider.GetRequiredService<IDoctorRepository>()));
         services.AddScoped(provider => new Lazy<IAppointmentRepository>(() => provider.GetRequiredService<IAppointmentRepository>()));
         services.AddScoped(provider => new Lazy<IMedicalRecordRepository>(() => provider.GetRequiredService<IMedicalRecordRepository>()));
+        services.AddScoped(provider => new Lazy<IPrescriptionRepository>(() => provider.GetRequiredService<IPrescriptionRepository>()));
     }
 
     public static void AddServiceLayer(this IServiceCollection services)
@@ -99,11 +101,13 @@ public static class ServiceExtensions
         services.AddScoped<IDoctorService, DoctorService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<IMedicalRecordService, MedicalRecordService>();
+        services.AddScoped<IPrescriptionService, PrescriptionService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped(provider => new Lazy<IPatientService>(() => provider.GetRequiredService<IPatientService>()));
         services.AddScoped(provider => new Lazy<IDoctorService>(() => provider.GetRequiredService<IDoctorService>()));
         services.AddScoped(provider => new Lazy<IAppointmentService>(() => provider.GetRequiredService<IAppointmentService>()));
         services.AddScoped(provider => new Lazy<IMedicalRecordService>(() => provider.GetRequiredService<IMedicalRecordService>()));
+        services.AddScoped(provider => new Lazy<IPrescriptionService>(() => provider.GetRequiredService<IPrescriptionService>()));
         services.AddScoped(provider => new Lazy<IAuthService>(() => provider.GetRequiredService<IAuthService>()));
     }
 }

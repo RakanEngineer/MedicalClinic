@@ -6,6 +6,7 @@ public interface IUnitOfWork
     IDoctorRepository DoctorRepository { get; }
     IAppointmentRepository AppointmentRepository { get; }
     IMedicalRecordRepository MedicalRecordRepository { get; }
+    IPrescriptionRepository PrescriptionRepository { get; }
 
     Task CompleteAsync();
 }

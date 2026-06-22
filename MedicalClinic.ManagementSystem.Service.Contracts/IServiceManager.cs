@@ -6,5 +6,6 @@ public interface IServiceManager
     IDoctorService DoctorService { get; }
     IAppointmentService AppointmentService { get; }
     IMedicalRecordService MedicalRecordService { get; }
+    IPrescriptionService PrescriptionService { get; }
     IAuthService AuthService { get; }
 }

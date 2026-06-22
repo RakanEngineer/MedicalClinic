@@ -54,3 +54,13 @@ public class MedicalRecordRequestParams : RequestParams
     [MaxLength(100)]
     public string? SearchTerm { get; set; }
 }
+
+public class PrescriptionRequestParams : RequestParams
+{
+    public Guid? PatientId { get; set; }
+    public Guid? DoctorId { get; set; }
+    public Guid? MedicalRecordId { get; set; }
+
+    [MaxLength(50)]
+    public string? Status { get; set; }
+}

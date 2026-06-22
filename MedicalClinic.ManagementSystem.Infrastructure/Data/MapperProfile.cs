@@ -4,6 +4,7 @@ using MedicalClinic.ManagementSystem.Shared.DTOs.Appointments;
 using MedicalClinic.ManagementSystem.Shared.DTOs.Doctors;
 using MedicalClinic.ManagementSystem.Shared.DTOs.MedicalRecords;
 using MedicalClinic.ManagementSystem.Shared.DTOs.Patients;
+using MedicalClinic.ManagementSystem.Shared.DTOs.Prescriptions;
 using MedicalClinic.ManagementSystem.Domain.Models.Entities;
 
 namespace MedicalClinic.ManagementSystem.Infrastructure.Data;
@@ -33,6 +34,13 @@ public class MapperProfile : Profile
         CreateMap<MedicalRecordCreateDto, MedicalRecord>()
             .ForMember(dest => dest.Id, opt => opt.Ignore());
         CreateMap<MedicalRecordUpdateDto, MedicalRecord>();
+
+        CreateMap<Prescription, PrescriptionDto>();
+        CreateMap<CreatePrescriptionDto, Prescription>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.IssuedAt, opt => opt.Ignore());
+        CreateMap<UpdatePrescriptionDto, Prescription>()
+            .ForMember(dest => dest.IssuedAt, opt => opt.Ignore());
 
         CreateMap<UserRegistrationDto, ApplicationUser>();
     }

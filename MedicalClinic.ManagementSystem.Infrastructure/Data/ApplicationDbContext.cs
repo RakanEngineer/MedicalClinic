@@ -11,6 +11,7 @@ namespace MedicalClinic.ManagementSystem.Infrastructure.Data
         public DbSet<Doctor> Doctors => Set<Doctor>();
         public DbSet<Appointment> Appointments => Set<Appointment>();
         public DbSet<MedicalRecord> MedicalRecords => Set<MedicalRecord>();
+        public DbSet<Prescription> Prescriptions => Set<Prescription>();
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

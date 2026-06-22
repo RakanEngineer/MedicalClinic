@@ -9,4 +9,5 @@ public class MedicalRecord
     public DateTime RecordDate { get; set; } = DateTime.UtcNow;
     public Guid PatientId { get; set; }
     public Patient? Patient { get; set; }
+    public ICollection<Prescription> Prescriptions { get; set; } = new List<Prescription>();
 }
