@@ -4,6 +4,7 @@ using MedicalClinic.ManagementSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MedicalClinic.ManagementSystem.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260622070823_Phase1Hardening")]
+    partial class Phase1Hardening
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,10 +136,7 @@ namespace MedicalClinic.ManagementSystem.Infrastructure.Data.Migrations
                     b.HasIndex("PatientId", "AppointmentDate")
                         .HasDatabaseName("IX_Appointments_PatientId_AppointmentDate");
 
-                    b.ToTable("Appointments", t =>
-                        {
-                            t.HasCheckConstraint("CK_Appointments_Status", "[Status] IN ('Scheduled', 'Completed', 'Cancelled', 'NoShow')");
-                        });
+                    b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("MedicalClinic.ManagementSystem.Domain.Models.Entities.Doctor", b =>

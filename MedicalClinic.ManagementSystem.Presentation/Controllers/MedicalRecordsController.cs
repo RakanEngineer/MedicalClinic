@@ -22,6 +22,7 @@ public class MedicalRecordsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.ClinicRead)]
     [ProducesResponseType(typeof(IEnumerable<MedicalRecordDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<MedicalRecordDto>>> GetMedicalRecords([FromQuery] MedicalRecordRequestParams requestParams)
     {
@@ -31,6 +32,7 @@ public class MedicalRecordsController : ControllerBase
     }
 
     [HttpGet("patient/{patientId:guid}")]
+    [Authorize(Policy = AuthorizationPolicies.ClinicRead)]
     [ProducesResponseType(typeof(IEnumerable<MedicalRecordDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<MedicalRecordDto>>> GetRecordsByPatient(Guid patientId, [FromQuery] MedicalRecordRequestParams requestParams)
     {
@@ -41,13 +43,14 @@ public class MedicalRecordsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Policy = AuthorizationPolicies.ClinicRead)]
     [ProducesResponseType(typeof(MedicalRecordDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MedicalRecordDto>> GetMedicalRecord(Guid id) =>
         Ok(await serviceManager.MedicalRecordService.GetMedicalRecordAsync(id));
 
     [HttpPost]
-    [Authorize(Policy = AuthorizationPolicies.CanWrite)]
+    [Authorize(Policy = AuthorizationPolicies.ClinicalWrite)]
     [ProducesResponseType(typeof(MedicalRecordDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<MedicalRecordDto>> CreateMedicalRecord(MedicalRecordCreateDto dto)
@@ -57,7 +60,7 @@ public class MedicalRecordsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Policy = AuthorizationPolicies.CanWrite)]
+    [Authorize(Policy = AuthorizationPolicies.ClinicalWrite)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -68,7 +71,7 @@ public class MedicalRecordsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Policy = AuthorizationPolicies.CanWrite)]
+    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
     public async Task<IActionResult> DeleteMedicalRecord(Guid id)
     {
         await serviceManager.MedicalRecordService.DeleteMedicalRecordAsync(id);

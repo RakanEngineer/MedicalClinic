@@ -76,7 +76,7 @@ public static class AuthServiceExtension
 
             options.AddPolicy(AuthorizationPolicies.CanWrite, policy =>
             {
-                policy.RequireRole(ClinicRoles.Admin)
+                policy.RequireRole(ClinicRoles.Admin, ClinicRoles.Receptionist)
                       .RequireAuthenticatedUser()
                       .RequireClaim(ClaimTypes.NameIdentifier)
                       .RequireClaim(ClaimTypes.Role);
@@ -85,7 +85,25 @@ public static class AuthServiceExtension
             options.AddPolicy(AuthorizationPolicies.AuthenticatedUser, policy =>
             {
                 policy.RequireAuthenticatedUser()
-                      .RequireRole(ClinicRoles.User, ClinicRoles.Admin);
+                      .RequireRole(ClinicRoles.Doctor, ClinicRoles.Receptionist, ClinicRoles.Admin)
+                      .RequireClaim(ClaimTypes.NameIdentifier)
+                      .RequireClaim(ClaimTypes.Role);
+            });
+
+            options.AddPolicy(AuthorizationPolicies.ClinicRead, policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                      .RequireRole(ClinicRoles.Doctor, ClinicRoles.Receptionist, ClinicRoles.Admin)
+                      .RequireClaim(ClaimTypes.NameIdentifier)
+                      .RequireClaim(ClaimTypes.Role);
+            });
+
+            options.AddPolicy(AuthorizationPolicies.ClinicalWrite, policy =>
+            {
+                policy.RequireAuthenticatedUser()
+                      .RequireRole(ClinicRoles.Doctor, ClinicRoles.Admin)
+                      .RequireClaim(ClaimTypes.NameIdentifier)
+                      .RequireClaim(ClaimTypes.Role);
             });
         });
     }

@@ -33,12 +33,12 @@ public class DataSeedHostingService : IHostedService
 
         try
         {
-            await CreateRolesAsync(roleManager, [ClinicRoles.Admin, ClinicRoles.User]);
-            logger.LogInformation("Template roles are ready.");
+            await CreateRolesAsync(roleManager, [ClinicRoles.Admin, ClinicRoles.Doctor, ClinicRoles.Receptionist]);
+            logger.LogInformation("Clinic roles are ready.");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Template role seed failed. The API will continue to start.");
+            logger.LogError(ex, "Clinic role seed failed. The API will continue to start.");
         }
     }
 

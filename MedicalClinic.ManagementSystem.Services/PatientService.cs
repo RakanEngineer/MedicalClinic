@@ -34,7 +34,14 @@ public class PatientService : IPatientService
 
     public async Task<PatientDto> CreatePatientAsync(PatientCreateDto dto)
     {
+        var normalizedPhoneNumber = NormalizePhoneNumber(dto.PhoneNumber);
+        var normalizedEmail = NormalizeEmail(dto.Email);
+
+        await EnsurePatientIsUniqueAsync(normalizedPhoneNumber, normalizedEmail);
+
         var patient = mapper.Map<Patient>(dto);
+        patient.PhoneNumber = normalizedPhoneNumber;
+        patient.Email = normalizedEmail;
         unitOfWork.PatientRepository.Create(patient);
         await unitOfWork.CompleteAsync();
         return mapper.Map<PatientDto>(patient);
@@ -45,7 +52,15 @@ public class PatientService : IPatientService
         if (id != dto.Id) throw new EntityIdMismatchException(nameof(Patient), id, dto.Id);
         var patient = await unitOfWork.PatientRepository.GetPatientAsync(id, trackChanges: true);
         if (patient is null) throw new EntityNotFoundException(nameof(Patient), id);
+
+        var normalizedPhoneNumber = NormalizePhoneNumber(dto.PhoneNumber);
+        var normalizedEmail = NormalizeEmail(dto.Email);
+
+        await EnsurePatientIsUniqueAsync(normalizedPhoneNumber, normalizedEmail, id);
+
         mapper.Map(dto, patient);
+        patient.PhoneNumber = normalizedPhoneNumber;
+        patient.Email = normalizedEmail;
         await unitOfWork.CompleteAsync();
     }
 
@@ -56,4 +71,26 @@ public class PatientService : IPatientService
         unitOfWork.PatientRepository.Delete(patient);
         await unitOfWork.CompleteAsync();
     }
+
+    private async Task EnsurePatientIsUniqueAsync(string phoneNumber, string? email, Guid? excludedPatientId = null)
+    {
+        if (await unitOfWork.PatientRepository.ExistsByPhoneNumberAsync(phoneNumber, excludedPatientId))
+            throw new PatientDuplicateException("phone number", phoneNumber);
+
+        if (!string.IsNullOrWhiteSpace(email) && await unitOfWork.PatientRepository.ExistsByEmailAsync(email, excludedPatientId))
+            throw new PatientDuplicateException("email", email);
+    }
+
+    private static string NormalizePhoneNumber(string phoneNumber)
+    {
+        string trimmed = phoneNumber.Trim();
+        return trimmed
+            .Replace(" ", string.Empty)
+            .Replace("-", string.Empty)
+            .Replace("(", string.Empty)
+            .Replace(")", string.Empty);
+    }
+
+    private static string? NormalizeEmail(string? email) =>
+        string.IsNullOrWhiteSpace(email) ? null : email.Trim().ToLowerInvariant();
 }

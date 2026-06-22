@@ -8,5 +8,6 @@ public record DoctorDto
     public string Specialty { get; init; } = string.Empty;
     public string PhoneNumber { get; init; } = string.Empty;
     public string? Email { get; init; }
+    public bool IsActive { get; init; }
     public DateTime CreatedAt { get; init; }
 }

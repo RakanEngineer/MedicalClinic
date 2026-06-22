@@ -22,6 +22,7 @@ public class AppointmentsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.ClinicRead)]
     [ProducesResponseType(typeof(IEnumerable<AppointmentDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetAppointments([FromQuery] AppointmentRequestParams requestParams)
     {
@@ -31,6 +32,7 @@ public class AppointmentsController : ControllerBase
     }
 
     [HttpGet("patient/{patientId:guid}")]
+    [Authorize(Policy = AuthorizationPolicies.ClinicRead)]
     [ProducesResponseType(typeof(IEnumerable<AppointmentDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetAppointmentsByPatient(Guid patientId, [FromQuery] AppointmentRequestParams requestParams)
     {
@@ -41,6 +43,7 @@ public class AppointmentsController : ControllerBase
     }
 
     [HttpGet("doctor/{doctorId:guid}")]
+    [Authorize(Policy = AuthorizationPolicies.ClinicRead)]
     [ProducesResponseType(typeof(IEnumerable<AppointmentDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetAppointmentsByDoctor(Guid doctorId, [FromQuery] AppointmentRequestParams requestParams)
     {
@@ -50,7 +53,34 @@ public class AppointmentsController : ControllerBase
         return Ok(pagedResult.Items);
     }
 
+    [HttpGet("doctor/{doctorId:guid}/date/{date:datetime}")]
+    [Authorize(Policy = AuthorizationPolicies.ClinicRead)]
+    [ProducesResponseType(typeof(IEnumerable<AppointmentDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetDoctorDailySchedule(Guid doctorId, DateTime date, [FromQuery] AppointmentRequestParams requestParams)
+    {
+        requestParams.DoctorId = doctorId;
+        requestParams.FromUtc = date.Date;
+        requestParams.ToUtc = date.Date.AddDays(1).AddTicks(-1);
+        var pagedResult = await serviceManager.AppointmentService.GetAppointmentsAsync(requestParams);
+        Response.Headers["X-Pagination"] = JsonSerializer.Serialize(pagedResult.MetaData);
+        return Ok(pagedResult.Items);
+    }
+
+    [HttpGet("patient/{patientId:guid}/date/{date:datetime}")]
+    [Authorize(Policy = AuthorizationPolicies.ClinicRead)]
+    [ProducesResponseType(typeof(IEnumerable<AppointmentDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetPatientDailySchedule(Guid patientId, DateTime date, [FromQuery] AppointmentRequestParams requestParams)
+    {
+        requestParams.PatientId = patientId;
+        requestParams.FromUtc = date.Date;
+        requestParams.ToUtc = date.Date.AddDays(1).AddTicks(-1);
+        var pagedResult = await serviceManager.AppointmentService.GetAppointmentsAsync(requestParams);
+        Response.Headers["X-Pagination"] = JsonSerializer.Serialize(pagedResult.MetaData);
+        return Ok(pagedResult.Items);
+    }
+
     [HttpGet("{id:guid}")]
+    [Authorize(Policy = AuthorizationPolicies.ClinicRead)]
     [ProducesResponseType(typeof(AppointmentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AppointmentDto>> GetAppointment(Guid id) =>
@@ -77,6 +107,17 @@ public class AppointmentsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPatch("{id:guid}/reschedule")]
+    [Authorize(Policy = AuthorizationPolicies.CanWrite)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RescheduleAppointment(Guid id, AppointmentRescheduleDto dto)
+    {
+        await serviceManager.AppointmentService.RescheduleAppointmentAsync(id, dto);
+        return NoContent();
+    }
+
     [HttpPatch("{id:guid}/cancel")]
     [Authorize(Policy = AuthorizationPolicies.CanWrite)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -88,7 +129,7 @@ public class AppointmentsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Policy = AuthorizationPolicies.CanWrite)]
+    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAppointment(Guid id)

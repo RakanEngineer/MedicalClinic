@@ -32,6 +32,8 @@ public class DoctorRequestParams : RequestParams
 
     [MaxLength(100)]
     public string? Specialty { get; set; }
+
+    public bool? IsActive { get; set; }
 }
 
 public class AppointmentRequestParams : RequestParams

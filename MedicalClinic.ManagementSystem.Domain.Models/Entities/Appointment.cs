@@ -4,7 +4,8 @@ public class Appointment
 {
     public Guid Id { get; set; }
     public DateTime AppointmentDate { get; set; }
-    public string Status { get; set; } = "Scheduled";
+    public int DurationMinutes { get; set; } = 30;
+    public string Status { get; set; } = AppointmentStatuses.Scheduled;
     public string? Notes { get; set; }
     public Guid DoctorId { get; set; }
     public Guid PatientId { get; set; }

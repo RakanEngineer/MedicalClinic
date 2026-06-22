@@ -13,6 +13,27 @@ public class PatientRepository : RepositoryBase<Patient>, IPatientRepository
     public async Task<Patient?> GetPatientAsync(Guid id, bool trackChanges = false) =>
         await FindByCondition(patient => patient.Id == id, trackChanges).FirstOrDefaultAsync();
 
+    public async Task<bool> ExistsByPhoneNumberAsync(string phoneNumber, Guid? excludedPatientId = null)
+    {
+        IQueryable<Patient> patients = FindByCondition(patient => patient.PhoneNumber == phoneNumber.Trim());
+
+        if (excludedPatientId.HasValue)
+            patients = patients.Where(patient => patient.Id != excludedPatientId.Value);
+
+        return await patients.AnyAsync();
+    }
+
+    public async Task<bool> ExistsByEmailAsync(string email, Guid? excludedPatientId = null)
+    {
+        string normalizedEmail = email.Trim();
+        IQueryable<Patient> patients = FindByCondition(patient => patient.Email != null && patient.Email == normalizedEmail);
+
+        if (excludedPatientId.HasValue)
+            patients = patients.Where(patient => patient.Id != excludedPatientId.Value);
+
+        return await patients.AnyAsync();
+    }
+
     public async Task<PagedList<Patient>> GetPatientsAsync(PatientRequestParams requestParams, bool trackChanges = false)
     {
         IQueryable<Patient> patients = FindAll(trackChanges).OrderBy(patient => patient.LastName).ThenBy(patient => patient.FirstName);

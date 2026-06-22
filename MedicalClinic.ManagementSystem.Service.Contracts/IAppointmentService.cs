@@ -9,6 +9,7 @@ public interface IAppointmentService
     Task<AppointmentDto> GetAppointmentAsync(Guid id, bool trackChanges = false);
     Task<AppointmentDto> CreateAppointmentAsync(AppointmentCreateDto dto);
     Task UpdateAppointmentAsync(Guid id, AppointmentUpdateDto dto);
+    Task RescheduleAppointmentAsync(Guid id, AppointmentRescheduleDto dto);
     Task CancelAppointmentAsync(Guid id);
     Task DeleteAppointmentAsync(Guid id);
 }

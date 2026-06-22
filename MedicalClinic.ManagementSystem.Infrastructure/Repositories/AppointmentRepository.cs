@@ -13,12 +13,15 @@ public class AppointmentRepository : RepositoryBase<Appointment>, IAppointmentRe
     public async Task<Appointment?> GetAppointmentAsync(Guid id, bool trackChanges = false) =>
         await FindByCondition(appointment => appointment.Id == id, trackChanges).FirstOrDefaultAsync();
 
-    public async Task<bool> HasOverlappingAppointmentAsync(Guid doctorId, DateTime appointmentDate, Guid? excludedAppointmentId = null)
+    public async Task<bool> HasOverlappingAppointmentAsync(Guid doctorId, DateTime appointmentDate, int durationMinutes, Guid? excludedAppointmentId = null)
     {
+        DateTime requestedEnd = appointmentDate.AddMinutes(durationMinutes);
+
         IQueryable<Appointment> appointments = FindByCondition(appointment =>
             appointment.DoctorId == doctorId &&
-            appointment.AppointmentDate == appointmentDate &&
-            appointment.Status != "Cancelled");
+            appointment.Status != AppointmentStatuses.Cancelled &&
+            appointment.AppointmentDate < requestedEnd &&
+            appointment.AppointmentDate.AddMinutes(appointment.DurationMinutes) > appointmentDate);
 
         if (excludedAppointmentId.HasValue)
             appointments = appointments.Where(appointment => appointment.Id != excludedAppointmentId.Value);

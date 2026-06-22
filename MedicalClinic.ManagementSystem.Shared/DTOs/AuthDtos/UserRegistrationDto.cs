@@ -19,5 +19,5 @@ public record UserRegistrationDto
     public string UserName { get; init; } = string.Empty;
 
     [Required]
-    public string Role { get; init; } = "User";
+    public string Role { get; init; } = "Receptionist";
 }

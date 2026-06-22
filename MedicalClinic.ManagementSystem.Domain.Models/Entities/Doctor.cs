@@ -8,6 +8,7 @@ public class Doctor
     public string Specialty { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
     public string? Email { get; set; }
+    public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 }

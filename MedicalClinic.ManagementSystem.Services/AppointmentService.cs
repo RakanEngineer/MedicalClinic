@@ -34,7 +34,9 @@ public class AppointmentService : IAppointmentService
 
     public async Task<AppointmentDto> CreateAppointmentAsync(AppointmentCreateDto dto)
     {
-        await EnsureDoctorIsAvailableAsync(dto.DoctorId, dto.AppointmentDate);
+        EnsureValidStatus(dto.Status);
+        await EnsureDoctorIsActiveAsync(dto.DoctorId);
+        await EnsureDoctorIsAvailableAsync(dto.DoctorId, dto.AppointmentDate, dto.DurationMinutes);
 
         var appointment = mapper.Map<Appointment>(dto);
         unitOfWork.AppointmentRepository.Create(appointment);
@@ -48,9 +50,24 @@ public class AppointmentService : IAppointmentService
         var appointment = await unitOfWork.AppointmentRepository.GetAppointmentAsync(id, trackChanges: true);
         if (appointment is null) throw new EntityNotFoundException(nameof(Appointment), id);
 
-        await EnsureDoctorIsAvailableAsync(dto.DoctorId, dto.AppointmentDate, id);
+        EnsureValidStatus(dto.Status);
+        await EnsureDoctorIsAvailableAsync(dto.DoctorId, dto.AppointmentDate, dto.DurationMinutes, id);
 
         mapper.Map(dto, appointment);
+        await unitOfWork.CompleteAsync();
+    }
+
+    public async Task RescheduleAppointmentAsync(Guid id, AppointmentRescheduleDto dto)
+    {
+        var appointment = await unitOfWork.AppointmentRepository.GetAppointmentAsync(id, trackChanges: true);
+        if (appointment is null) throw new EntityNotFoundException(nameof(Appointment), id);
+
+        await EnsureDoctorIsActiveAsync(appointment.DoctorId);
+        await EnsureDoctorIsAvailableAsync(appointment.DoctorId, dto.AppointmentDate, dto.DurationMinutes, id);
+
+        appointment.AppointmentDate = dto.AppointmentDate;
+        appointment.DurationMinutes = dto.DurationMinutes;
+        appointment.Status = AppointmentStatuses.Scheduled;
         await unitOfWork.CompleteAsync();
     }
 
@@ -59,7 +76,7 @@ public class AppointmentService : IAppointmentService
         var appointment = await unitOfWork.AppointmentRepository.GetAppointmentAsync(id, trackChanges: true);
         if (appointment is null) throw new EntityNotFoundException(nameof(Appointment), id);
 
-        appointment.Status = "Cancelled";
+        appointment.Status = AppointmentStatuses.Cancelled;
         await unitOfWork.CompleteAsync();
     }
 
@@ -71,9 +88,23 @@ public class AppointmentService : IAppointmentService
         await unitOfWork.CompleteAsync();
     }
 
-    private async Task EnsureDoctorIsAvailableAsync(Guid doctorId, DateTime appointmentDate, Guid? excludedAppointmentId = null)
+    private async Task EnsureDoctorIsAvailableAsync(Guid doctorId, DateTime appointmentDate, int durationMinutes, Guid? excludedAppointmentId = null)
     {
-        bool hasOverlap = await unitOfWork.AppointmentRepository.HasOverlappingAppointmentAsync(doctorId, appointmentDate, excludedAppointmentId);
+        bool hasOverlap = await unitOfWork.AppointmentRepository.HasOverlappingAppointmentAsync(doctorId, appointmentDate, durationMinutes, excludedAppointmentId);
         if (hasOverlap) throw new AppointmentOverlapException(doctorId, appointmentDate);
+    }
+
+    private async Task EnsureDoctorIsActiveAsync(Guid doctorId)
+    {
+        var doctor = await unitOfWork.DoctorRepository.GetDoctorAsync(doctorId);
+
+        if (doctor is null) throw new EntityNotFoundException(nameof(Doctor), doctorId);
+        if (!doctor.IsActive) throw new DoctorInactiveException(doctorId);
+    }
+
+    private static void EnsureValidStatus(string status)
+    {
+        if (!AppointmentStatuses.All.Contains(status))
+            throw new AppointmentStatusException(status);
     }
 }

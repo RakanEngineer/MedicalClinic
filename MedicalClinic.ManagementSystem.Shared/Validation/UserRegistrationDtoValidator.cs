@@ -25,7 +25,7 @@ public class UserRegistrationDtoValidator : AbstractValidator<UserRegistrationDt
             .MinimumLength(8);
 
         RuleFor(dto => dto.Role)
-            .Must(role => role is ClinicRoles.User or ClinicRoles.Admin)
-            .WithMessage("Role must be User or Admin.");
+            .Must(role => role is ClinicRoles.Doctor or ClinicRoles.Receptionist or ClinicRoles.Admin)
+            .WithMessage("Role must be Doctor, Receptionist, or Admin.");
     }
 }

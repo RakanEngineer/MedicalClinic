@@ -14,6 +14,10 @@ public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
         builder.Property(doctor => doctor.Specialty).IsRequired().HasMaxLength(100);
         builder.Property(doctor => doctor.PhoneNumber).IsRequired().HasMaxLength(30);
         builder.Property(doctor => doctor.Email).HasMaxLength(254);
+        builder.Property(doctor => doctor.IsActive).IsRequired();
         builder.Property(doctor => doctor.CreatedAt).IsRequired();
+
+        builder.HasIndex(doctor => doctor.Specialty)
+            .HasDatabaseName("IX_Doctors_Specialty");
     }
 }

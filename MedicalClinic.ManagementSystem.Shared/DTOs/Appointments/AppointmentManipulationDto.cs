@@ -7,6 +7,9 @@ public abstract record AppointmentManipulationDto
     [Required]
     public DateTime AppointmentDate { get; init; }
 
+    [Range(5, 480)]
+    public int DurationMinutes { get; init; } = 30;
+
     [Required]
     [MaxLength(50)]
     public string Status { get; init; } = "Scheduled";

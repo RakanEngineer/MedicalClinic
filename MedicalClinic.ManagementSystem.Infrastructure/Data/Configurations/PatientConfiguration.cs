@@ -17,5 +17,14 @@ public class PatientConfiguration : IEntityTypeConfiguration<Patient>
         builder.Property(patient => patient.Address).HasMaxLength(250);
         builder.Property(patient => patient.DateOfBirth).IsRequired();
         builder.Property(patient => patient.CreatedAt).IsRequired();
+
+        builder.HasIndex(patient => new { patient.LastName, patient.FirstName })
+            .HasDatabaseName("IX_Patients_LastName_FirstName");
+
+        builder.HasIndex(patient => patient.PhoneNumber)
+            .HasDatabaseName("IX_Patients_PhoneNumber");
+
+        builder.HasIndex(patient => patient.Email)
+            .HasDatabaseName("IX_Patients_Email");
     }
 }

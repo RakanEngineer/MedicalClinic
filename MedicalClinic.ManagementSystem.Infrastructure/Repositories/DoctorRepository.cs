@@ -17,6 +17,9 @@ public class DoctorRepository : RepositoryBase<Doctor>, IDoctorRepository
     {
         IQueryable<Doctor> doctors = FindAll(trackChanges).OrderBy(doctor => doctor.LastName).ThenBy(doctor => doctor.FirstName);
 
+        if (requestParams.IsActive.HasValue)
+            doctors = doctors.Where(doctor => doctor.IsActive == requestParams.IsActive.Value);
+
         if (!string.IsNullOrWhiteSpace(requestParams.Specialty))
         {
             string specialty = requestParams.Specialty.Trim();

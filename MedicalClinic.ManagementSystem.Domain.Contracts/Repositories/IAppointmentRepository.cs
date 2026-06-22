@@ -7,5 +7,5 @@ public interface IAppointmentRepository : IRepositoryBase<Appointment>
 {
     Task<PagedList<Appointment>> GetAppointmentsAsync(AppointmentRequestParams requestParams, bool trackChanges = false);
     Task<Appointment?> GetAppointmentAsync(Guid id, bool trackChanges = false);
-    Task<bool> HasOverlappingAppointmentAsync(Guid doctorId, DateTime appointmentDate, Guid? excludedAppointmentId = null);
+    Task<bool> HasOverlappingAppointmentAsync(Guid doctorId, DateTime appointmentDate, int durationMinutes, Guid? excludedAppointmentId = null);
 }
